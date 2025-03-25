@@ -1,4 +1,4 @@
-# node-red-contrib-mongodb4
+# node-red-contrib-clickhouse
 
 A Clickhouse driver node for Node-Red.
 
