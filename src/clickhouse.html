@@ -1,0 +1,377 @@
+<script type="text/javascript">
+    RED.nodes.registerType("clickhouse-client", {
+        category: "config",
+        color: "#3FA037",
+        defaults: {
+            name: { value: "" },
+            protocol: { value: "http", required: true },
+            hostname: { value: "" },
+            port: { value: "8123" },
+            dbName: { value: "", required: true },
+			pathname: { value: "" },
+            appName: { value: "" },
+            maxPoolSize: { value: "100" },
+            maxIdleTimeMS: { value: "2500" },
+            uri: { value: "" },
+            uriTabActive: { value: "tab-uri-simple" },
+        },
+        credentials: {
+            username: { value: "", type: "text" },
+            password: { value: "", type: "password" },
+        },
+        label: function () {
+            return this.name || `${this.hostname} ${this.dbName}`;
+        },
+        oneditprepare: function () {
+            // uri tabs
+            this.uriTabs = RED.tabs.create({
+                id: "tabs",
+                onchange: function (tab) {
+                    $("#tabs-content").children().hide();
+                    $("#" + tab.id).show();
+                },
+            });
+
+            this.uriTabs.addTab({
+                id: "tab-uri-simple",
+                label: "Simple Connection URI",
+            });
+
+            this.uriTabs.addTab({
+                id: "tab-uri-advanced",
+                label: "Advanced Connection URI",
+            });
+
+            if (this.uriTabActive) {
+                this.uriTabs.activateTab(this.uriTabActive);
+            }
+        },
+        oneditsave: function () {
+            this.uriTabActive =
+                this.uriTabs.listTabs()[this.uriTabs.activeIndex()];
+        },
+    });
+</script>
+
+<script type="text/html" data-template-name="clickhouse-client">
+    <div class="form-row">
+        <label for="node-config-input-name"
+            ><i class="fa fa-tag"></i> Name</label
+        >
+        <input type="text" id="node-config-input-name" />
+    </div>
+    <div class="form-row tabs-row">
+        <ul style="min-width: 600px; margin-bottom: 20px;" id="tabs"></ul>
+    </div>
+    <div id="tabs-content">
+        <div id="tab-uri-simple" style="display:none">
+            <div class="form-row">
+                <label for="node-config-input-protocol">
+                    <i class="fa fa-envelope-o"></i> Protocol
+                </label>
+                <select id="node-config-input-protocol">
+                    <option value="http">http</option>
+                    <option value="https">https</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="node-config-input-hostname">
+                    <i class="fa fa-server"></i> Hostname
+                </label>
+                <input
+                    type="text"
+                    id="node-config-input-hostname"
+                    placeholder="localhost"
+                />
+            </div>
+            <div class="form-row">
+                <label for="node-config-input-port">
+                    <i class="fa fa-plug"></i> Port
+                </label>
+                <input
+                    type="text"
+                    id="node-config-input-port"
+                    placeholder="optional"
+                />
+            </div>
+        </div>
+        <div id="tab-uri-advanced" style="display:none">
+            <div class="form-row">
+                <label for="node-config-input-uri">
+                    <i class="fa fa-bolt"></i> URI
+                </label>
+                <input
+                    type="text"
+                    id="node-config-input-uri"
+                    placeholder="http://localhost:8123"
+                />
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-dbName">
+            <i class="fa fa-database"></i> Database
+        </label>
+        <input type="text" id="node-config-input-dbName" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-appName">
+            <i class="fa fa-id-card-o"></i> AppName
+        </label>
+        <input type="text" id="node-config-input-appName" placeholder="optional" />
+    </div>
+	<div class="form-row">
+        <label for="node-config-input-pathname">
+            <i class="fa fa-id-card-o"></i> Pathname
+        </label>
+        <input type="text" id="node-config-input-pathname" placeholder="optional" />
+    </div>
+	
+    <div class="form-row">
+        <label for="node-config-input-username">
+            <i class="fa fa-user"></i> Username
+        </label>
+        <input type="text" id="node-config-input-username" />
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-password">
+            <i class="fa fa-unlock-alt"></i> Password
+        </label>
+        <input type="password" id="node-config-input-password" />
+    </div>
+    
+    <div class="form-row">
+        <label
+            for="node-config-input-maxPoolSize"
+            style="width: 200px;"
+        >
+            <i class="fa fa-clock-o"></i> MaxPoolSize
+        </label>
+        <input
+            id="node-config-input-maxPoolSize"
+            type="number"
+            min="0"
+            placeholder="100"
+            style="max-width:calc(100% - 210px);"
+        />
+    </div>
+    <div class="form-row">
+        <label
+            for="node-config-input-maxIdleTimeMS"
+            style="width: 200px;"
+        >
+            <i class="fa fa-clock-o"></i> MaxIdleTimeMS
+        </label>
+        <input
+            id="node-config-input-maxIdleTimeMS"
+            type="number"
+            min="0"
+            placeholder="0"
+            style="max-width:calc(100% - 210px);"
+        />
+    </div>
+</script>
+
+<script type="text/markdown" data-help-name="clickhouse-client">
+Configuration node for Clickhouse connection config.
+Node will create a Clickhouse Client.
+
+### Simple Connection URI
+
+-   **Protocol** - `http` or `https`
+
+-   **Hostname** - Hostname / IP to connect to Clickhouse
+
+-   **Port** - Optional port number. In most cases `8123`.
+
+-   **Pathname** - Custom path name to add to URI. [Details](https://clickhouse.com/docs/integrations/javascript#proxy-with-a-pathname)
+
+### Advanced Connection URI
+
+-   **URI** - Define your own connection string in URI format.
+
+### Authentication (optional)
+
+-   **Username** - Username for authentication.
+
+-   **Password** - Password for authentication.
+
+### Application
+
+-   **Database** - A Clickhouse database name is required.
+
+-   **Application Name** - The name of the application that created this MongoClient instance. MongoDB 3.4 and newer will print this value in the server log upon establishing each connection. It is also recorded in the slow query log and profile collections.
+
+If this field is unspecified, the client node will create a app name for you.
+That looks like this: `nodered-azmr5z97`. The prefix `nodered` is static. `azmr5z97` is a random connection pool id, created on runtime start-up, config-node update and full deployment.
+
+The current app name of a config node is logged to the node-red runtime log.
+
+
+### Connect Options
+
+-   **MaxPoolsize** - Specifies the maximum number of connections the driver should create in its connection pool. This count includes connections in use.
+
+-   **MaxIdleTimeMS** - Specifies the amount of time, in milliseconds, a connection can be idle before it's closed. Specifying 0 means no minimum.
+
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType("clickhouse", {
+        category: "storage-input",
+        color: "#3FA037",
+        defaults: {
+            clientNode: { type: "clickhouse-client" },
+            mode: { value: "collection" },
+            table: { value: "" },
+            output: { value: "toArray" },
+			//format: { value: "JSONEachRow" },
+            //maxTimeMS: { value: "0" },
+            name: { value: "" },
+			query: { value: "" },
+			wait: { value: false },
+			returnError: { value: false },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "db.svg",
+        label: function () {
+            return this.name || this.operation || "clickhouse";
+        },
+		oneditprepare: function () {
+			//$('#node-input-rowsPerMsg').value = this.split ? this.rowsPerMsg : 1;
+			this.editor = RED.editor.createEditor({
+				id: 'node-input-editor',
+				mode: 'ace/mode/sql',
+				value: $('#node-input-query').val(),
+			});
+			this.editor.focus();
+		},
+		oneditsave: function () {
+			$('#node-input-query').val(this.editor.getValue());
+			this.editor.destroy();
+			delete this.editor;
+		},
+		oneditcancel: function() {
+			this.editor.destroy();
+			delete this.editor;
+		},
+    });
+</script>
+
+<script type="text/html" data-template-name="clickhouse">
+    <div class="form-row">
+        <label for="node-input-name">
+            <i class="fa fa-tag"></i> Name
+        </label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-clientNode">
+            <i class="fa fa-server"></i> Connection
+        </label>
+        <input type="text" id="node-input-clientNode" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-mode">
+            <i class="fa fa-sitemap"></i> Mode
+        </label>
+        <select id="node-input-mode" style="width: calc(100% - 140px);">
+            <option value="query">query operation (w/ results)</option>
+            <option value="command">command operation (w/o results)</option>
+			<option value="insert">insert operation (w/ payload as array)</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-table">
+            <i class="fa fa-archive"></i> Table
+        </label>
+        <input
+            type="text"
+            id="node-input-table"
+            placeholder="msg.table"
+        />
+    </div>
+    <div class="form-row">
+        <label for="node-input-output">
+            <i class="fa fa-sign-out"></i> Output
+        </label>
+        <select id="node-input-output" style="width: calc(100% - 140px);">
+            <option value="toArray">toArray</option>
+            <option value="forEach">forEach</option>
+        </select>
+    </div>
+	<div class="form-row">
+        <input
+            type="checkbox"
+            id="node-input-wait"
+            style="display: inline-block; width: auto; vertical-align: top;"
+        />
+        <label for="node-input-wait" style="width: auto;"
+            >Wait for completion</label
+        >
+    </div>
+	<div class="form-row">
+        <input
+            type="checkbox"
+            id="node-input-returnError"
+            style="display: inline-block; width: auto; vertical-align: top;"
+        />
+        <label for="node-input-returnError" style="width: auto;"
+            >Do not throw error (place it into msg)</label
+        >
+    </div>
+	<div class="form-row" style="position: relative; margin-bottom: 0px;">
+		<label for="node-input-query">
+			<i class="fa fa-file-code-o"></i> Query
+		</label>
+		<input type="hidden" id="node-input-query" autofocus="autofocus" />
+	</div>
+	<div class="form-row node-text-editor-row">
+		<div style="height: 300px; min-height: 150px;" class="node-text-editor" id="node-input-editor"></div>
+	</div>
+</script>
+
+<script type="text/markdown" data-help-name="clickhouse">
+Execute Clickhouse table operations with this node.
+
+### Inputs / Options
+
+-   **Connection (clickhouse-client)** - Select a Clickhouse server connection.
+
+-   **Mode | msg.mode (string)** - Decide which operation do you want to use {'query', 'command', 'insert'}
+
+-   **Table | msg.table (string)** - table name for insert operation.
+
+-   **Output | msg.output (string)** - Define output processing for 'query' mode {'toArray', 'forEach'}.  
+'forEach' produce output for each received record in stream manner and additional msg with an payload equal to null.
+
+-   **Format | msg.format (string)** - format output. By default assigned 'JSONEachRow' value but you can define your own if needed.
+
+-   **msg.payload (array | JSON )** - Pass message payload as array for 'insert' mode. For 'query' mode it should be JSON object.
+
+-   **Wait for completion** - With this feature enabled, the operation node will wait until execution were complete. See [wait_end_of_query](https://clickhouse.com/docs/operations/settings/settings#http_wait_end_of_query)
+
+-   **Do not throw error (place it into msg)** - With this feature enabled, the operation node will return error in msg insted of throwing it
+
+### Payload Output
+
+The node will output the database driver response as message payload.
+The mode `query` can output with `toArray` or `forEach`.
+
+
+### Node Status 
+
+Node status information is displayed below the node:
+
+#### Tags
+- **s** : Number of successful executions
+- **err** : Number of failed executions 
+- **rt** : Last execution runtime in ms 
+
+#### Colors
+- **green** : Last execution was successful 
+- **blue** : Node execution in progress 
+- **red** : Last execution failed
+
+</script>
