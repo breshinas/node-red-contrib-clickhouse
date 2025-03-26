@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-clickhouse",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A clickhouse node for Node-Red",
     "keywords": [
         "node-red",
@@ -29,10 +29,6 @@
         "node": ">=16.20.1"
     },
     "devDependencies": {
-        "dotenv": "^16.4.7",
-        "mocha": "^11.0.1",
         "node-red": "^4.0.8",
-        "node-red-node-test-helper": "^0.3.4",
-        "should": "^13.2.3"
     }
 }
