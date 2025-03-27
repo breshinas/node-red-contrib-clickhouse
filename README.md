@@ -2,15 +2,21 @@
 
 A Clickhouse driver node for Node-Red.
 
+[![npm version](https://img.shields.io/npm/v/node-red-contrib-clickhouse.svg?style=flat-square)](https://www.npmjs.org/package/node-red-contrib-clickhouse))
+[![install size](https://img.shields.io/badge/dynamic/json?url=https://packagephobia.com/v2/api.json?p=node-red-contrib-clickhouse&query=$.install.pretty&label=install%20size&style=flat-square)](https://packagephobia.now.sh/result?p=node-red-contrib-clickhouse)
+[![npm downloads](https://img.shields.io/npm/dm/node-red-contrib-clickhouse.svg?style=flat-square)](https://npm-stat.com/charts.html?package=node-red-contrib-clickhouse)
+
 This package includes two nodes for node-red:
 
 **The Config Node**
 
 Connect to your local Clickhouse Server or a Cloud versions.
+![client-node](https://raw.githubusercontent.com/breshinas/node-red-contrib-clickhouse/refs/heads/master/examples/config-node.png)
 
 **The Flow Node**
 
 Execute an query/insert/command within your flow.
+![flow-node](https://raw.githubusercontent.com/breshinas/node-red-contrib-clickhouse/refs/heads/master/examples/operation-node.png)
 
 _This node was inspired by other projects like [node-red-contrib-mongodb4](https://github.com/steineey/node-red-contrib-mongodb4)
 
@@ -32,7 +38,10 @@ NodeJS >= v16.20.1
 
 ## Usage Example
 
-I will add it later ))
+Import the example flow to get a quick introduction how to use this node. \
+[flow.json](https://raw.githubusercontent.com/breshinas/node-red-contrib-clickhouse/refs/heads/master/examples/example-1.json) \
+\
+![flow-image](https://raw.githubusercontent.com/breshinas/node-red-contrib-clickhouse/refs/heads/master/examples/example-1-flow.png)
 
 ## The Configuration Node
 
