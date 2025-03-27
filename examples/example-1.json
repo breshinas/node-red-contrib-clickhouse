@@ -1,0 +1,885 @@
+[
+    {
+        "id": "f84fe21bfb96294f",
+        "type": "tab",
+        "label": "clickhouse demo",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "0c75fd74244852ae",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "query",
+        "table": "",
+        "output": "toArray",
+        "name": "",
+        "query": "CREATE TABLE IF NOT EXISTS test_db.products (\n    id UUID DEFAULT generateUUIDv4(),\n    article String,\n    brand String,\n    name String,\n    created_at DateTime DEFAULT now(),\n    updated_at DateTime DEFAULT now(),\n    source Nullable(String) COMMENT 'some source',\n    filename Nullable(String)\n) ENGINE = MergeTree()\nORDER BY id;",
+        "wait": true,
+        "returnError": false,
+        "x": 530,
+        "y": 80,
+        "wires": [
+            [
+                "ca85b3d3646e1222"
+            ]
+        ]
+    },
+    {
+        "id": "886b73926f7b7afa",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "ch create products if not exists",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 80,
+        "wires": [
+            [
+                "0c75fd74244852ae"
+            ]
+        ]
+    },
+    {
+        "id": "ca85b3d3646e1222",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "31ae684fa5383355",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "query",
+        "table": "",
+        "output": "toArray",
+        "name": "",
+        "query": "select * from test_db.products p\norder by p.created_at desc\nLIMIT {limit_rows: UInt32}",
+        "wait": false,
+        "returnError": false,
+        "x": 530,
+        "y": 140,
+        "wires": [
+            [
+                "1a2b3560fab24aa6"
+            ]
+        ]
+    },
+    {
+        "id": "6a0d9e30ebe8203b",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "ch table query",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"limit_rows\":100}",
+        "payloadType": "json",
+        "x": 110,
+        "y": 140,
+        "wires": [
+            [
+                "31ae684fa5383355"
+            ]
+        ]
+    },
+    {
+        "id": "1a2b3560fab24aa6",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "408b6239497fdaf8",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "insert",
+        "table": "test_db.products",
+        "output": "toArray",
+        "name": "",
+        "query": "",
+        "wait": true,
+        "returnError": false,
+        "x": 530,
+        "y": 260,
+        "wires": [
+            [
+                "84a161e7da9a4568"
+            ]
+        ]
+    },
+    {
+        "id": "84a161e7da9a4568",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "865d08b7456958e9",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "ch table add array",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"id\":\"b676478a-3697-4e4f-85d4-000000000000\",\"article\":\"test entry\",\"brand\":\"Custom\",\"name\":\"TV 55\\\"\",\"source\":\"Amazon\",\"filename\":\"file1.csv\"},{\"id\":\"b676478a-3697-4e4f-85d4-000000000001\",\"article\":\"DEF456\",\"brand\":\"Samsung\",\"name\":\"Smartphone Galaxy S24\",\"source\":\"AliExpress\",\"filename\":null},{\"id\":\"b676478a-3697-4e4f-85d4-000000000002\",\"article\":\"GHI789\",\"brand\":\"Apple\",\"name\":\"MacBook Pro 16\\\"\",\"source\":null,\"filename\":\"file3.csv\"}]",
+        "payloadType": "json",
+        "x": 130,
+        "y": 260,
+        "wires": [
+            [
+                "408b6239497fdaf8"
+            ]
+        ]
+    },
+    {
+        "id": "c157c5b4dd7d11c3",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "query",
+        "table": "",
+        "output": "toArray",
+        "name": "",
+        "query": "select COUNT(*) as count\nfrom test_db.products",
+        "wait": false,
+        "returnError": true,
+        "x": 530,
+        "y": 200,
+        "wires": [
+            [
+                "02566ebc7d9fdef1",
+                "252ba7a1d1ba0c75"
+            ]
+        ]
+    },
+    {
+        "id": "02566ebc7d9fdef1",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload[0].count",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "612fa7054b10745f",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "ch table count",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 200,
+        "wires": [
+            [
+                "c157c5b4dd7d11c3"
+            ]
+        ]
+    },
+    {
+        "id": "63aa88c1ca425a6b",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "ch custom query",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "query",
+                "v": "select id,article, brand, name, created_at, updated_at from test_db.products p order by p.created_at desc LIMIT {limit_rows: UInt32}",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"limit_rows\":100}",
+        "payloadType": "json",
+        "x": 120,
+        "y": 320,
+        "wires": [
+            [
+                "5fdb4220bb3b9722"
+            ]
+        ]
+    },
+    {
+        "id": "5fdb4220bb3b9722",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "query",
+        "table": "",
+        "output": "toArray",
+        "name": "",
+        "query": "",
+        "wait": false,
+        "returnError": false,
+        "x": 530,
+        "y": 320,
+        "wires": [
+            [
+                "9e92cde3f4904d51"
+            ]
+        ]
+    },
+    {
+        "id": "9e92cde3f4904d51",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "125980daba497e50",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "ch table update",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "query",
+                "v": "ALTER TABLE test_db.products    UPDATE brand = {new_brand: String}    WHERE id = {article_id: String}",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"new_brand\":\"Custom Updated\",\"article_id\":\"b676478a-3697-4e4f-85d4-000000000000\"}",
+        "payloadType": "json",
+        "x": 120,
+        "y": 380,
+        "wires": [
+            [
+                "ca7e2baa29a36714"
+            ]
+        ]
+    },
+    {
+        "id": "ca7e2baa29a36714",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "query",
+        "table": "",
+        "output": "toArray",
+        "name": "",
+        "query": "",
+        "wait": false,
+        "returnError": false,
+        "x": 530,
+        "y": 380,
+        "wires": [
+            [
+                "3b5beaffac82bf77"
+            ]
+        ]
+    },
+    {
+        "id": "3b5beaffac82bf77",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "b0d863dabf6231e2",
+        "type": "function",
+        "z": "f84fe21bfb96294f",
+        "name": "ch table gen100k",
+        "func": "msg.query = `\nINSERT INTO test_db.products (article, brand, name, source, filename)\nSELECT \n    toString(number) AS article,\n    'Brand_' || toString(number % 10) AS brand,\n    'Product ' || toString(number) AS name,\n    NULL AS source,\n    NULL AS filename\nFROM numbers(100000);\n`;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 440,
+        "wires": [
+            [
+                "c03933903d037616"
+            ]
+        ]
+    },
+    {
+        "id": "6b8db94a85088ef1",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "test",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 90,
+        "y": 440,
+        "wires": [
+            [
+                "b0d863dabf6231e2"
+            ]
+        ]
+    },
+    {
+        "id": "c03933903d037616",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "query",
+        "table": "",
+        "output": "toArray",
+        "name": "",
+        "query": "",
+        "wait": true,
+        "returnError": false,
+        "x": 530,
+        "y": 440,
+        "wires": [
+            [
+                "d8e43e14fe19d727"
+            ]
+        ]
+    },
+    {
+        "id": "d8e43e14fe19d727",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "e57f4439f9821dd3",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "test",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 90,
+        "y": 500,
+        "wires": [
+            [
+                "1a733921a3f39742"
+            ]
+        ]
+    },
+    {
+        "id": "1a733921a3f39742",
+        "type": "function",
+        "z": "f84fe21bfb96294f",
+        "name": "ch table delete",
+        "func": "msg.query = `\n  DELETE FROM test_db.products \n  WHERE id = {article_id: String}\n`;\nmsg.payload = {\n  article_id: 'b676478a-3697-4e4f-85d4-000000000000'\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 500,
+        "wires": [
+            [
+                "2771bca0e01a53dc"
+            ]
+        ]
+    },
+    {
+        "id": "0f4765777c6ff7e9",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "2771bca0e01a53dc",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "command",
+        "table": "",
+        "output": "toArray",
+        "name": "",
+        "query": "",
+        "wait": false,
+        "returnError": false,
+        "x": 530,
+        "y": 500,
+        "wires": [
+            [
+                "0f4765777c6ff7e9"
+            ]
+        ]
+    },
+    {
+        "id": "c73385c1dce6e152",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "ch table TRUNCATE",
+        "props": [
+            {
+                "p": "query",
+                "v": "TRUNCATE TABLE test_db.products;",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 560,
+        "wires": [
+            [
+                "a5f98ee7f05a1ffc"
+            ]
+        ]
+    },
+    {
+        "id": "a5f98ee7f05a1ffc",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "command",
+        "table": "",
+        "output": "toArray",
+        "name": "",
+        "query": "",
+        "wait": false,
+        "returnError": false,
+        "x": 530,
+        "y": 560,
+        "wires": [
+            [
+                "298eca04c5db7e6e"
+            ]
+        ]
+    },
+    {
+        "id": "298eca04c5db7e6e",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "d1a5c5a3e03d71d6",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "ch table DROP",
+        "props": [
+            {
+                "p": "query",
+                "v": "DROP TABLE test_db.products;",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 120,
+        "y": 620,
+        "wires": [
+            [
+                "e0af7c62a8bfc983"
+            ]
+        ]
+    },
+    {
+        "id": "e0af7c62a8bfc983",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "command",
+        "table": "",
+        "output": "toArray",
+        "name": "",
+        "query": "",
+        "wait": false,
+        "returnError": false,
+        "x": 530,
+        "y": 620,
+        "wires": [
+            [
+                "258256050498e92e"
+            ]
+        ]
+    },
+    {
+        "id": "258256050498e92e",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "252ba7a1d1ba0c75",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "20d446625ec83e1a",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "ch custom mode",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "query",
+                "v": "select id,article, brand, name, created_at, updated_at from test_db.products p order by p.created_at desc LIMIT {limit_rows: UInt32}",
+                "vt": "str"
+            },
+            {
+                "p": "mode",
+                "v": "query",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"limit_rows\":100}",
+        "payloadType": "json",
+        "x": 120,
+        "y": 680,
+        "wires": [
+            [
+                "c2e303eec08a6c0f"
+            ]
+        ]
+    },
+    {
+        "id": "c2e303eec08a6c0f",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "command",
+        "table": "",
+        "output": "toArray",
+        "name": "",
+        "query": "",
+        "wait": false,
+        "returnError": true,
+        "x": 530,
+        "y": 680,
+        "wires": [
+            [
+                "f869e4e85123987f"
+            ]
+        ]
+    },
+    {
+        "id": "f869e4e85123987f",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "9bc0d945ff7ddd38",
+        "type": "catch",
+        "z": "f84fe21bfb96294f",
+        "name": "catch all",
+        "scope": null,
+        "uncaught": false,
+        "x": 920,
+        "y": 80,
+        "wires": [
+            [
+                "bd114522434a875a"
+            ]
+        ]
+    },
+    {
+        "id": "bd114522434a875a",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "CATCH",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1080,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "5415a83f2e110e84",
+        "type": "clickhouse",
+        "z": "f84fe21bfb96294f",
+        "clientNode": "654e989bde223c42",
+        "mode": "query",
+        "table": "",
+        "output": "toArray",
+        "name": "",
+        "query": "CREATE DATABASE IF NOT EXISTS test_db;",
+        "wait": true,
+        "returnError": false,
+        "x": 530,
+        "y": 20,
+        "wires": [
+            [
+                "8faeb62ee690694c"
+            ]
+        ]
+    },
+    {
+        "id": "d30fe2f8128f437f",
+        "type": "inject",
+        "z": "f84fe21bfb96294f",
+        "name": "ch create database test_db",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 20,
+        "wires": [
+            [
+                "5415a83f2e110e84"
+            ]
+        ]
+    },
+    {
+        "id": "8faeb62ee690694c",
+        "type": "debug",
+        "z": "f84fe21bfb96294f",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "654e989bde223c42",
+        "type": "clickhouse-client",
+        "name": "clickhouse",
+        "protocol": "http",
+        "hostname": "localhost",
+        "port": "8123",
+        "dbName": "default",
+        "pathname": "",
+        "appName": "",
+        "maxPoolSize": "100",
+        "maxIdleTimeMS": "2500",
+        "uri": "",
+        "uriTabActive": "tab-uri-simple"
+    }
+]
