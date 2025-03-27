@@ -2,7 +2,7 @@
 
 A Clickhouse driver node for Node-Red.
 
-[![npm version](https://img.shields.io/npm/v/node-red-contrib-clickhouse.svg?style=flat-square)](https://www.npmjs.org/package/node-red-contrib-clickhouse))
+[![npm version](https://img.shields.io/npm/v/node-red-contrib-clickhouse.svg?style=flat-square)](https://www.npmjs.org/package/node-red-contrib-clickhouse)
 [![install size](https://img.shields.io/badge/dynamic/json?url=https://packagephobia.com/v2/api.json?p=node-red-contrib-clickhouse&query=$.install.pretty&label=install%20size&style=flat-square)](https://packagephobia.now.sh/result?p=node-red-contrib-clickhouse)
 [![npm downloads](https://img.shields.io/npm/dm/node-red-contrib-clickhouse.svg?style=flat-square)](https://npm-stat.com/charts.html?package=node-red-contrib-clickhouse)
 
@@ -69,7 +69,7 @@ Import the example flow to get a quick introduction how to use this node. \
 
 -   **Database** - A Clickhouse database name is required.
 
--   **Application Name** - The name of the application that created this MongoClient instance. MongoDB 3.4 and newer will print this value in the server log upon establishing each connection. It is also recorded in the slow query log and profile collections.
+-   **Application Name** - The name of the application that created this ClickHouse instance.
 
 If this field is unspecified, the client node will create a app name for you.
 That looks like this: `nodered-azmr5z97`. The prefix `nodered` is static. `azmr5z97` is a random connection pool id, created on runtime start-up, config-node update and full deployment.
@@ -89,7 +89,7 @@ Each configuration node has his own connection pool with a default max poolsize 
 
 ## The Flow Node
 
-Execute MongoDB collection operations with this node.
+Execute clickhouse operations with this node.
 
 ### Inputs / Options
 
