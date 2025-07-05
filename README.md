@@ -55,15 +55,17 @@ Import the example flow to get a quick introduction how to use this node. \
 
 -   **Pathname** - Custom path name to add to URI. [Details](https://clickhouse.com/docs/integrations/javascript#proxy-with-a-pathname)
 
+Note: you can set all values in config node to environment variable using form `${CLICKHOUSE_HOST}`. Nodered will convert that to your actual setting on startup.
+
 ### Advanced Connection URI
 
 -   **URI** - Define your own connection string in URI format.
 
 ### Authentication (optional)
 
--   **Username** - Username for authentication.
+-   **Username** - Username for authentication. Also you can define username as environment `CLICKHOUSE_USER` (it override username value)
 
--   **Password** - Password for authentication.
+-   **Password** - Password for authentication. Also you can define password as environment `CLICKHOUSE_PASSWORD` (it override username value)
 
 ### Application
 

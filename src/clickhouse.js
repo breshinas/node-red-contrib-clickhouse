@@ -48,8 +48,8 @@ module.exports = function (RED) {
     node.clickhouseClient = createClient({
       url: clickhouseUri, // e.g., 'http://localhost:8123'
       pathname: config.pathname || '',
-      username: node.credentials.username || '',
-      password: node.credentials.password || '',
+      username: process.env["CLICKHOUSE_USER"] || node.credentials.username || '',
+      password: process.env["CLICKHOUSE_PASSWORD"] || node.credentials.password || '',
       database: config.dbName,
       application: appName,
       max_open_connections: parseInt(config.maxPoolSize || '100', 10),
@@ -93,6 +93,40 @@ module.exports = function (RED) {
     const node = this;
 
     node.client = RED.nodes.getNode(config.clientNode);
+	
+    if (!node.client) {
+      node.client = {
+        clickhouseClient: createClient({
+          url: process.env["CLICKHOUSE_URI"] || "http://clickhouse:8123",
+          pathname: process.env["CLICKHOUSE_PATHNAME"] || "",
+          username: process.env["CLICKHOUSE_USER"] || "admin",
+          password: process.env["CLICKHOUSE_PASSWORD"] || "pass",
+          database: process.env["CLICKHOUSE_DB"] || "default",
+          application: process.env["APP_NAME"] || "Node-RED",
+          max_open_connections: parseInt(process.env["CLICKHOUSE_POOL_SIZE"] || "100", 10),
+          request_timeout: 400_000,
+          keep_alive: {
+            enabled: true,
+            idle_socket_ttl: parseInt(process.env["CLICKHOUSE_MAX_IDLE_MS"] || "2500", 10),
+          },
+          clickhouse_settings: {
+            send_progress_in_http_headers: 1,
+            http_headers_progress_interval_ms: '110000',
+          },
+        }),
+      };
+
+      // ensure cleanup on redeploy or shutdown
+      node.on('close', async (removed, done) => {
+        done = done || function () {};
+        if (node.client?.clickhouseClient) {
+          await node.client.clickhouseClient.close();
+          node.log("Env-based ClickHouse client closed");
+        }
+        done();
+      });
+    }
+
 
     node.config = {
       mode: config.mode, // "query" || "insert"
@@ -102,7 +136,7 @@ module.exports = function (RED) {
       //format: config.format || 'JSONEachRow',
       wait: config.wait,
       // maxTimeMS: parseInt(config.maxTimeMS || "0", 10),
-	  returnError: config.returnError,
+      returnError: config.returnError,
     };
 
     // display node metric in node status
@@ -285,7 +319,7 @@ module.exports = function (RED) {
               result = await node.client.clickhouseClient.command(cmd);
               send({ ...msg, payload: result });
             } else {
-			  cmd.format = msg.format || 'JSONEachRow';
+              cmd.format = msg.format || 'JSONEachRow';
               result = await node.client.clickhouseClient.query(cmd);
 
               // Handle output processing based on configuration
